@@ -4,16 +4,20 @@ module Graphics.Delaunay
     ) where
 
 import Graphics.Point
-import Graphics.WingedEdge as WE
+-- import Graphics.WingedEdge as WE
+import Graphics.MeshPoint as MP
+import Graphics.Graph
+
+import Data.Set
 
 delaunayIO :: IO ()
 delaunayIO = putStrLn "delaunayIO"
 
--- | Takes a list of points (TODO: define) and returns a list of WingedEdges (TODO: define)
-delaunayTriangulationOf :: [ Point ] -> [ WingedEdge ]
-delaunayTriangulationOf []    = []
-delaunayTriangulationOf [_]   = []
-delaunayTriangulationOf [a,b] = []
+-- | Takes a list of points and returns a list of MeshPoints.
+delaunayTriangulationOf :: [ Point ] -> Graph
+delaunayTriangulationOf []    = Graph empty
+delaunayTriangulationOf [_]   = Graph empty
+delaunayTriangulationOf [a,b] = Graph empty
 {-
   = [ WingedEdge { WE.id = 1,
                    startPt = a,
@@ -31,6 +35,11 @@ delaunayTriangulationOf [a,b,c]
         /   \
        b-----c
 -}
+  = Graph (fromList [ meshPoint a [ b, c ] 
+                   , meshPoint b [ a, c ] 
+                   , meshPoint c [ a, b ] 
+                   ])
+{-
   = [ WingedEdge { WE.id = 1,
                    startPt = a,
                    endPt = b
@@ -48,3 +57,4 @@ delaunayTriangulationOf [a,b,c]
                    endPt = a
                  }
     ]
+-}

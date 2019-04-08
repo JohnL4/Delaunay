@@ -1,11 +1,14 @@
 module Graphics.Graph
   (
-    Graph
+    Graph ( Graph )
   )
   where
 
-import Graphics.WingedEdge
+-- import Graphics.WingedEdge
+import Graphics.MeshPoint
+import Data.Set
 
--- | A graph is a list of winged edges.  There are no isolated points, since we're just interested in drawing lines, not
--- dots.
-data Graph = Graph [ WingedEdge ]
+-- | A graph is a collection of points, each of which is associated with a collection of adjacent points, which adjacent
+-- points determine edges from the first point.
+data Graph = Graph (Set MeshPoint)
+  deriving (Eq, Show)

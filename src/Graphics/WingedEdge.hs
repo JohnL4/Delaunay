@@ -1,3 +1,5 @@
+-- Maybe a winged edge will be useful someday, but not today.
+
 module Graphics.WingedEdge
   (
     WingedEdge ( WingedEdge ),
@@ -6,8 +8,6 @@ module Graphics.WingedEdge
   where
 
 import Graphics.Point
-
--- Hmm, how to represent a graph in Haskell?  There are lots of possibilities.
 
 -- | A unique id
 type Id = Integer
