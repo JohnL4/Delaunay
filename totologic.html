@@ -1,0 +1,584 @@
+<html>
+  <head></head>
+  <body>
+    <!-- Shamelessly stolen from http://totologic.blogspot.com/2014/01/accurate-point-in-triangle-test.html because I
+         don't trust the web to keep track of it.
+      -->
+<div dir="ltr" style="text-align: left;" trbidi="on">
+Many resources on the web deal with the <i>2D point in triangle test</i>. This post will summarize the most famous methods to solve it and will show why in some cases they are not accurate and can lead to errors. As a conclusion, we will expose a new algorithm.<br>
+<div>
+<br></div>
+<div>
+At first, we need to remember the problem. We are in 2D. We have a triangle <i>T</i> defined by 3 points <i>p1(x1, y1), p2(x2, y2), p3(x3, y3)</i> and a single point <i>p(x, y)</i>. Does this single point <i>p</i> lies inside the triangle <i>T</i> ?</div>
+<div>
+<div style="text-align: center;">
+<br></div>
+</div>
+<div>
+  <!--
+  <div style="text-align: center;">
+<embed align="middle" allowscriptaccess="always" height="270" pluginspage="http://www.macromedia.com/go/getflashplayer" quality="high" src="//www.flashkarting.com/_totologic/pointInTriangle.swf" style="border: 2px solid #000000;" type="application/x-shockwave-flash" width="290">
+  </div>
+  -->
+</div>
+<div>
+<br>
+<br></div>
+<div>
+<h4 style="text-align: left;">
+<b><span style="font-size: large;">1st method : barycentric coordinate system</span></b></h4>
+</div>
+<div>
+<a href="http://en.wikipedia.org/wiki/Barycentric_coordinate_system" target="_blank">Barycentric coordinate</a> allows to express new<i> p</i>&nbsp;coordinates as a linear combination of <i>p1, p2, p3</i>. More precisely, it defines 3 scalars <i>a, b, c</i> such that :</div>
+<div>
+<br></div>
+<div>
+x = a * x1 + b * x2 &nbsp;+ c * x3</div>
+<div>
+y = a * y1 + b * y2 + c * y3</div>
+<div>
+a + b + c = 1</div>
+<div>
+<br></div>
+<div>
+The way to compute <i>a, b, c </i>is not difficult :</div>
+<div>
+<br></div>
+<div>
+a = ((y2 - y3)*(x - x3) + (x3 - x2)*(y - y3)) / ((y2 - y3)*(x1 - x3) + (x3 - x2)*(y1 - y3))</div>
+<div>
+b =&nbsp;((y3 - y1)*(x - x3) + (x1 - x3)*(y - y3)) / ((y2 - y3)*(x1 - x3) + (x3 - x2)*(y1 - y3))</div>
+<div>
+c = 1 - a - b</div>
+<div>
+<br></div>
+<div>
+Then we just need to apply the interesting following property :</div>
+<div>
+<br></div>
+<div>
+<i>p</i> lies in <i>T</i> if and only if <i>0 &lt;= a &lt;= 1</i> and <i>0 &lt;= b &lt;= 1</i> and <i>0 &lt;= c &lt;= 1</i></div>
+<div>
+<br>
+Code sample :<br>
+<br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;">function pointInTriangle(x1, y1, x2, y2, x3, y3, x, y:Number):Boolean</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;">{</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>var denominator:Number = ((y2 - y3)*(x1 - x3) + (x3 - x2)*(y1 - y3));</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>var a:Number = ((y2 - y3)*(x - x3) + (x3 - x2)*(y - y3)) / denominator;</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>var b:Number = ((y3 - y1)*(x - x3) + (x1 - x3)*(y - y3)) / denominator;</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>var c:Number = 1 - a - b;</span><br>
+<span class="Apple-tab-span" style="white-space: pre;"><span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"> </span></span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>return 0 &lt;= a &amp;&amp; a &lt;= 1 &amp;&amp; 0 &lt;= b &amp;&amp; b &lt;= 1 &amp;&amp; 0 &lt;= c &amp;&amp; c &lt;= 1;</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;">}</span></div>
+<div>
+<br></div>
+<div>
+<h4 style="text-align: left;">
+<b><span style="font-size: large;">2nd method : parametric equations system</span></b></h4>
+</div>
+<div>
+Here the idea is to consider the parametric expressions of the 2 edges [<i>p1, p2]</i>&nbsp;and<i>&nbsp;[p1, p3]</i>&nbsp;in <i>T :</i></div>
+<div>
+<br></div>
+<div>
+x(t1) = t1*(x2 - x1)</div>
+<div>
+y(t1) = t1*(y2 - y1)</div>
+<div>
+<br></div>
+<div>
+x(t2) = t2*(x3 - x1)</div>
+<div>
+y(t2) = t2*(y3 - y1)</div>
+<div>
+<br></div>
+<div>
+Then express <i>p(x, y)</i> as a linear combination of them :</div>
+<div>
+<br></div>
+<div>
+x = x1 + x(t1) + x(t2)</div>
+<div>
+y = y1 + y(t1) + y(t2)</div>
+<div>
+<br></div>
+<div>
+Solving the system, it gives to us :</div>
+<div>
+<br></div>
+<div>
+t1 =&nbsp;(x*(y3 - y1) + y*(x1 - x3) - x1*y3 + y1*x3) /&nbsp;(x1*(y2 - y3) + y1*(x3 - x2) + x2*y3 - y2*x3)</div>
+<div>
+t2 = (x*(y2 - y1) + y*(x1 - x2) - x1*y2 + y1*x2) / -(x1*(y2 - y3) + y1*(x3 - x2) + x2*y3 - y2*x3)</div>
+<div>
+<br></div>
+<div>
+Finally, we just need to apply the interesting following property :</div>
+<div>
+<br></div>
+<div>
+<i>p</i>&nbsp;lies in&nbsp;<i>T</i>&nbsp;if and only if&nbsp;<i>0 &lt;= t1 &lt;= 1</i>&nbsp;and&nbsp;<i>0 &lt;= t2 &lt;= 1</i>&nbsp;and&nbsp;<i>t1 + t2 &lt;= 1</i></div>
+<div>
+<br>
+Code sample :<br>
+<br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;">function pointInTriangle(x1, y1, x2, y2, x3, y3, x, y:Number):Boolean</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;">{</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>var denominator:Number = (x1*(y2 - y3) + y1*(x3 - x2) + x2*y3 - y2*x3);</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>var t1:Number = (x*(y3 - y1) + y*(x1 - x3) - x1*y3 + y1*x3) / denominator;</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>var t2:Number = (x*(y2 - y1) + y*(x1 - x2) - x1*y2 + y1*x2) / -denominator;</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>var s:Number = t1 + t2;</span><br>
+<span class="Apple-tab-span" style="white-space: pre;"><span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"> </span></span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>return 0 &lt;= t1 &amp;&amp; t1 &lt;= 1 &amp;&amp; 0 &lt;= t2 &amp;&amp; t2 &lt;= 1 &amp;&amp; s &lt;= 1;</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;">}</span></div>
+<div>
+<br></div>
+<div>
+<h4 style="text-align: left;">
+<b><span style="font-size: large;">3rd method : check sides with dot product</span></b></h4>
+</div>
+<div>
+Maybe the most famous method, based on <a href="http://en.wikipedia.org/wiki/Dot_product" target="_blank">dot product</a>. We assume that <i>p1, p2, p3</i> are ordered in counterclockwise. Then we can check if <i>p</i> lies at left of the 3 oriented edges <i>[p1, p2]</i>, <i>[p2, p3]</i> and <i>[p3, p1].</i></div>
+<div>
+<br></div>
+<div>
+For that, first we need to consider &nbsp;the 3 vectors&nbsp;<i>v1, v2 </i>and<i> v3</i>&nbsp;that are respectively left-orthogonal to&nbsp;<i>[p1, p2]</i>,&nbsp;<i>[p2, p3]</i>&nbsp;and&nbsp;<i>[p3, p1]</i><i>&nbsp;:</i></div>
+<div>
+<br></div>
+<div>
+v1 = &lt;y2 - y1, -x2 + x1&gt;</div>
+<div>
+v2 = &lt;y3 - y2, -x3 + x2&gt;</div>
+<div>
+v3 = &lt;y1 - y3, -x1 + x3&gt;</div>
+<div>
+<br></div>
+<div>
+Then we get the 3 following vectors :</div>
+<div>
+<br></div>
+<div>
+v1' = &lt;x - x1, y - y1&gt;</div>
+<div>
+v2' = &lt;x - x2, y - y2&gt;</div>
+<div>
+v3' = &lt;x - x3, y - y3&gt;</div>
+<div>
+<br></div>
+<div>
+At last, we compute the 3 dot products :</div>
+<div>
+dot1 = v1 . v1' = (y2 - y1)*(x - x1) + (-x2 + x1)*(y - y1)</div>
+<div>
+dot2 = v1 . v2' = (y3 - y2)*(x - x2) + (-x3 + x2)*(y - y2)</div>
+<div>
+dot3 = v3 . v3' = (y1 - y3)*(x - x3) + (-x1 + x3)*(y - y3)</div>
+<div>
+<br></div>
+<div>
+Finally, we can apply the interesting property :</div>
+<div>
+<br></div>
+<div>
+<i>p</i>&nbsp;lies in&nbsp;<i>T</i>&nbsp;if and only if&nbsp;<i>0 &lt;= dot1&nbsp;</i>and&nbsp;<i>0 &lt;= dot2&nbsp;</i>and&nbsp;<i>0 &lt;= dot3</i></div>
+<div>
+<br>
+Code sample :<br>
+<br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;">function side(x1, y1, x2, y2, x, y:Number):Number</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;">{</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>return (y2 - y1)*(x - x1) + (-x2 + x1)*(y - y1);</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;">}</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><br>
+function pointInTriangle(x1, y1, x2, y2, x3, y3, x, y:Number):Boolean</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;">{</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>var checkSide1:Boolean = side(x1, y1, x2, y2, x, y) &gt;= 0;</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>var checkSide2:Boolean = side(x2, y2, x3, y3, x, y) &gt;= 0;</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>var checkSide3:Boolean = side(x3, y3, x1, y1, x, y) &gt;= 0;</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>return checkSide1 &amp;&amp; checkSide2 &amp;&amp; checkSide3;</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;">}</span><br>
+<br></div>
+<div>
+<br></div>
+<div>
+These 3 methods are quite good to solve the point in triangle test. Purely mathematically speaking, they must validate any point inside the triangle and even those lying exactly on the boundary (on any edge).</div>
+<div>
+<br>
+<br></div>
+<div>
+<h4 style="text-align: left;">
+<b><span style="font-size: large;">Accuracy problems</span></b></h4>
+</div>
+<div>
+Despite the strong mathematical background of our methods, in some cases they can lead to a lack of accuracy because the floating-point number system have limited size and most of the time it deals with approximations. The problem occurs sometimes when the point p should exactly on one triangle's edge ; the approximations lead to fail the test.</div>
+<div>
+<br></div>
+<div>
+<b>Example 1*:</b></div>
+<div>
+We consider the&nbsp;triangle&nbsp;<i>T</i>&nbsp;defined by 3 points&nbsp;<i>p1(x1, y1), p2(x2, y2), p3(x3, y3)</i>&nbsp;with values :</div>
+<div>
+<br></div>
+<div>
+<div>
+x1 = 1/10</div>
+<div>
+y1 = 1/9</div>
+<div>
+x2 = 100/8</div>
+<div>
+y2 = 100/3</div>
+<div>
+x3 = 100/4</div>
+<div>
+y3 = 100/9</div>
+</div>
+<div>
+<br></div>
+<div>
+and&nbsp;a single point&nbsp;<i>p(x, y)</i>&nbsp;lying exactly on the segment [p1, p2] :</div>
+<div>
+<div>
+x = x1 + (3/7)*(x2 - x1)</div>
+<div>
+y = y1 + (3/7)*(y2 - y1)<br>
+<br>
+<div class="separator" style="clear: both; text-align: center;">
+<a href="http://www.flashkarting.com/_totologic/inaccuray_example1.jpg" imageanchor="1" style="margin-left: 1em; margin-right: 1em;"><img border="0" src="https://lh3.googleusercontent.com/proxy/DxDJNRaDipu7y6HTAQaeQQnEAO8etpWHSoc-ojzAjfO_49ou6FCLbfN0ttmT1o8efSDXME5LuNpUkpPjqEibVZgl4T5PWhqlFHqU2Dv4ybsO=s0-d"></a></div>
+<br></div>
+</div>
+<div>
+<br></div>
+<div>
+If we apply the barycentric method, we get the 3 following values for<i> a, b, c</i> :</div>
+<div>
+<br></div>
+<div>
+a : 0.5714285714285715</div>
+<div>
+b :&nbsp;0.42857142857142855</div>
+<div>
+<span style="color: red;">c :&nbsp;-5.551115123125783e-17</span></div>
+<div>
+<br></div>
+<div>
+Because <i>c &lt; 0</i>, the test fails to validate the point inside the triangle. In many applications, this situation is not really a problem because a lack of accuracy is not a tragedy.</div>
+<div>
+<br></div>
+<div>
+But in some situations, it can be really annoying.</div>
+<div>
+<br></div>
+<div>
+<b>Example 2*:</b></div>
+<div>
+We consider 2 triangles&nbsp;<i>T&nbsp;</i>and&nbsp;<i>T'</i>&nbsp;defined respectively by the points&nbsp;<i>p1(x1, y1), p2(x2, y2), p3(x3, y3) and&nbsp;</i><i>p1'(x1', y1'), p2'(x2', y2'), p3'(x3', y3').&nbsp;</i>Values are :</div>
+<div>
+<br></div>
+<div>
+<div>
+<div>
+x1 = 1/10</div>
+<div>
+y1 = 1/9</div>
+<div>
+x2 = 100/8</div>
+<div>
+y2 = 100/3</div>
+<div>
+x3 = 100/4</div>
+<div>
+y3 = 100/9</div>
+</div>
+</div>
+<div>
+<br></div>
+<div>
+<div>
+<div>
+x1' = x1</div>
+<div>
+y1' = y1</div>
+<div>
+x2' = x2</div>
+<div>
+y2' = y2</div>
+<div>
+x3' = -100/8</div>
+<div>
+y3' = 100/6</div>
+</div>
+</div>
+<div>
+<br></div>
+<div>
+<div>
+and&nbsp;a single point&nbsp;<i>p(x, y)</i>&nbsp;lying exactly on the segment [p1, p2] :</div>
+<div>
+<div>
+x = x1 + (3/7)*(x2 - x1)</div>
+<div>
+y = y1 + (3/7)*(y2 - y1)<br>
+<br>
+<div class="separator" style="clear: both; text-align: center;">
+<a href="http://www.flashkarting.com/_totologic/inaccuray_example2.jpg" imageanchor="1" style="margin-left: 1em; margin-right: 1em;"><img border="0" src="https://lh3.googleusercontent.com/proxy/Jv1Zef0x6-57K980Rv6L1R5UheGnwKXy0N8OoAbQRDOyDEjZ2vVgRUeZYpIQuM8MEuEpeFsHxmR320HHhQulCTBSTYzCVwsRq9zmMhXLMqfd=s0-d"></a></div>
+<br></div>
+</div>
+</div>
+<div>
+<br></div>
+<div>
+The situation is quite simple : 2 non-overlapping triangles sharing one edge and one single point lying on this edge. We know from the previous example that the barycentric method fails to validate&nbsp;<i>p</i> inside the triangle <i>T</i> :</div>
+<div>
+<br></div>
+<div>
+<div>
+a : 0.5714285714285715</div>
+<div>
+b :&nbsp;0.42857142857142855</div>
+<div>
+<span style="color: red;">c :&nbsp;-5.551115123125783e-17</span></div>
+<div>
+<br></div>
+<div>
+But more surprisely, the method fails again when applied to the triangle <i>T'</i> :</div>
+</div>
+<div>
+<br></div>
+<div>
+<div>
+a : 0.5714285714285715</div>
+<div>
+b : 0.4285714285714285</div>
+<div>
+c : <span style="color: red;">-1.1102230246251565e-16</span></div>
+</div>
+<div>
+<br></div>
+<div>
+Mathematically speaking, the point p belongs to both triangles. In practice, we could tolerate that a lack of accuracy leads to validate only one triangle belonging. But here we face a complete invalidation and the point is detected as outside both triangles.</div>
+<div>
+<br></div>
+<div>
+We could suppose that the barycentric-based method is intrinsically inaccurate and one other method will lead to satisfiable results. But in reality the problem remains.</div>
+<div>
+<br></div>
+<div>
+<div>
+<b>Example 3*:</b></div>
+<div>
+We consider the oriented edge&nbsp;<i>E</i>&nbsp;defined by 2 points&nbsp;<i>p1(x1, y1) </i>and<i> p2(x2, y2)&nbsp;</i>with values :</div>
+<div>
+<br></div>
+<div>
+<div>
+x1 = 1/10</div>
+<div>
+y1 = 1/9</div>
+<div>
+x2 = 100/8</div>
+<div>
+y2 = 100/3</div>
+</div>
+<div>
+<br></div>
+<div>
+and&nbsp;a single point&nbsp;<i>p(x, y)</i>&nbsp;lying exactly on edge <i>E</i> :</div>
+<div>
+<div>
+x = x1 + (3/7)*(x2 - x1)</div>
+<div>
+y = y1 + (3/7)*(y2 - y1)</div>
+</div>
+<div>
+<br></div>
+<div>
+If we apply the check side method with <i>E</i> and <i>p</i>,&nbsp;we get the following dot product&nbsp;:</div>
+<div>
+dot = (y2 - y1)*(x - x1) + (-x2 + x1)*(y - y1)</div>
+<div>
+dot =&nbsp;<span style="color: red;">-2.842170943040401e-14</span></div>
+<div>
+<br></div>
+</div>
+<div>
+Then if we apply the same method with <i>E'</i> the reversed edge of<i> E</i>, we get the same result :</div>
+<div>
+<div>
+dot = (y1 - y2)*(x - x2) + (-x1 + x2)*(y - y2)</div>
+<div>
+dot =&nbsp;<span style="color: red;">-2.842170943040401e-14</span></div>
+</div>
+<div>
+<br></div>
+<div>
+It means that the check side test gives us 2 contradictory results. The point looks on the right sides of both the edge E and his reversed ; that is of course mathematically impossible. We face the same situation as using barycentric method : if the edge <i>E</i> is shared by 2 non-overlapping triangles <i>T</i> and <i>T'</i>, despite the fact that <i>p</i> lies mathematically on <i>E</i>, our method will lead us to tragically conclude that&nbsp;<i>p</i> is outside both triangles&nbsp;<i>T</i>&nbsp;and&nbsp;<i>T'</i>.</div>
+<div>
+<br>
+<br></div>
+<div>
+<div>
+<h4 style="text-align: left;">
+<b><span style="font-size: large;">Any accurate solution ?</span></b></h4>
+</div>
+<div>
+The answer is yes. We can write a complete algorithm leading to a safe point in triangle test by combining many familiar algorithms. The core of the method is to assume a real thickness value for the triangle's edges and vertices ; it contrasts with the original purely mathematical situation where the triangle's edges and vertices have an infinitesimal thickness. We will call it&nbsp;<b style="font-style: italic;">epsilon</b>, because&nbsp;in practice we will keep it very small (near 0.001).<br>
+<br>
+<div class="separator" style="clear: both; text-align: center;">
+<a href="http://www.flashkarting.com/_totologic/epsilon_triangle.jpg" imageanchor="1" style="margin-left: 1em; margin-right: 1em;"><img border="0" src="https://lh5.googleusercontent.com/proxy/Ey_byymV6deHaPSOq11f7OKZLD5io05F02HgXh8XVeT7nPvufTF_WI2vJaghAX8kBOVFzTtW6teteqmHRGHAyv5uIWMcK2kcV8lOHkMiBg=s0-d"></a></div>
+<br></div>
+</div>
+<div>
+<br>
+The steps of the algorithm are:<br>
+<br>
+<b>1: use a bounding box as a fast pre-validation test</b><br>
+Because our new algorithm will involve more computations, it is convenient to add a pre-test to reject very quickly most of the false cases.<br>
+<br>
+The bounding box is simply the min/max of the x/y values among the 3 triangle's vertices, slightly inflated by the <i>epsilon </i>value.<br>
+<br>
+<div class="separator" style="clear: both; text-align: center;">
+<a href="http://www.flashkarting.com/_totologic/triangle_bounding.jpg" imageanchor="1" style="margin-left: 1em; margin-right: 1em;"><img border="0" src="https://lh3.googleusercontent.com/proxy/F32a3kzWlOTozoblLh2R8bKA-yrTmicu1l-VlLnkWBAbzQY8G2f3LGLBfHsYR8N-PD9DtWYZA2J_F98hUcY_FFCJBSi41E2grBT3Wh6l-No=s0-d"></a></div>
+<br>
+<br>
+Code sample :<br>
+<br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;">const EPSILON:Number = 0.001;</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><br></span>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;">function pointInTriangleBoundingBox(x1, y1, x2, y2, x3, y3, x, y:Number):Boolean</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;">{</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>var xMin:Number = Math.min(x1, Math.min(x2, x3)) - EPSILON;</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>var xMax:Number = Math.max(x1, Math.max(x2, x3)) + EPSILON;</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>var yMin:Number = Math.min(y1, Math.min(y2, y3)) - EPSILON;</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>var yMax:Number = Math.max(y1, Math.max(y2, y3)) + EPSILON;</span><br>
+<span class="Apple-tab-span" style="white-space: pre;"><span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"> </span></span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>if ( x &lt; xMin || xMax &lt; x || y &lt; yMin || yMax &lt; y )</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;">  </span>return false;</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>else</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;">  </span>return true;</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;">}</span><br>
+<br>
+<b>2: use any method studied prevously (barycentric, parametric or dot product)</b><br>
+If the test is positive, we can trust it and stop the algorithm immediatly. But if the test is negative, maybe we face the situation with the point lying on one triangle's edge : then we need more investigations, involving methods using the <i>epsilon </i>value.<br>
+<br>
+<b>3: use the point to segment distance</b><br>
+For every edge of the triangle, we compute the shortest distance between the edge and the point to evaluate. If the distance is shorter that <i>epsilon</i>, we can validate definitely the test.<br>
+<br>
+In detail, given 3 points&nbsp;&nbsp;<i>p</i>, <i>p1</i> and <i>p2</i>, a very tricky use of the dot product allows us to check efficiently the relative position of the orthogonal projection <i>p'</i> of <i>p</i> on the infinite line passing through <i>p1 </i>and <i>p2</i>. If the projection lies between <i>p1</i> and <i>p2</i> then we compute the distance <i>p</i> and <i>p'.&nbsp;</i>Otherwise, we compute the distance between <i>p</i> and the nearest among<i> p1</i> and <i>p2.</i><br>
+<br>
+<div class="separator" style="clear: both; text-align: center;">
+<a href="http://www.flashkarting.com/_totologic/ortho_proj.jpg" imageanchor="1" style="margin-left: 1em; margin-right: 1em;"><img border="0" src="https://lh6.googleusercontent.com/proxy/t3-OyLJ7iSM6yaKUvf0DdtDMqYQ344RPyf_0qJ0kXD3OZAftDpTcoROjPN_P8rOvfxiV9AOrLAmtShN3QeD9AWynaJrVk8My_Q=s0-d"></a></div>
+<br>
+Finally, because our algorithm use distances for comparisons only, we will restrict our computations to square distances only (faster because we can omit the square root).<br>
+<br>
+Code sample:<br>
+<br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;">function distanceSquarePointToSegment(x1, y1, x2, y2, x, y:Number):Number</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;">{</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>var p1_p2_squareLength:Number = (x2 - x1)*(x2 - x1) + (y2 - y1)*(y2 - y1);</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>var dotProduct:Number = ((x - x1)*(x2 - x1) + (y - y1)*(y2 - y1)) / p1_p2_squareLength;</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>if ( dotProduct &lt; 0 )</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>{</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;">  </span>return (x - x1)*(x - x1) + (y - y1)*(y - y1);</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>}</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>else if ( dotProduct &lt;= 1 )</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>{</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;">  </span>var p_p1_squareLength:Number = (x1 - x)*(x1 - x) + (y1 - y)*(y1 - y);</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;">  </span>return p_p1_squareLength - dotProduct * dotProduct * p1_p2_squareLength;</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>}</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>else</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>{</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;">  </span>return (x - x2)*(x - x2) + (y - y2)*(y - y2);</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>}</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;">}</span><br>
+<br>
+<br>
+<div>
+<h4>
+<b><span style="font-size: large;">Final sample code</span></b></h4>
+</div>
+<div>
+Here is the code illustrating the steps we described in the previous section.<br>
+<br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;">const EPSILON:Number = 0.001;</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;">const EPSILON_SQUARE:Number = EPSILON*EPSILON;</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><br></span>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;">function side(x1, y1, x2, y2, x, y:Number):Number</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;">{</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>return (y2 - y1)*(x - x1) + (-x2 + x1)*(y - y1);</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;">}</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><br></span>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;">function naivePointInTriangle(x1, y1, x2, y2, x3, y3, x, y:Number):Boolean</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;">{</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>var checkSide1:Boolean = side(x1, y1, x2, y2, x, y) &gt;= 0;</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>var checkSide2:Boolean = side(x2, y2, x3, y3, x, y) &gt;= 0;</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>var checkSide3:Boolean = side(x3, y3, x1, y1, x, y) &gt;= 0;</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>return checkSide1 &amp;&amp; checkSide2 &amp;&amp; checkSide3;</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;">}</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><br></span>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;">function pointInTriangleBoundingBox(x1, y1, x2, y2, x3, y3, x, y:Number):Boolean</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;">{</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>var xMin:Number = Math.min(x1, Math.min(x2, x3)) - EPSILON;</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>var xMax:Number = Math.max(x1, Math.max(x2, x3)) + EPSILON;</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>var yMin:Number = Math.min(y1, Math.min(y2, y3)) - EPSILON;</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>var yMax:Number = Math.max(y1, Math.max(y2, y3)) + EPSILON;</span><br>
+<span class="Apple-tab-span" style="white-space: pre;"><span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"> </span></span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>if ( x &lt; xMin || xMax &lt; x || y &lt; yMin || yMax &lt; y )</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;">  </span>return false;</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>else</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;">  </span>return true;</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;">}</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><br></span>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;">function distanceSquarePointToSegment(x1, y1, x2, y2, x, y:Number):Number</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;">{</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>var p1_p2_squareLength:Number = (x2 - x1)*(x2 - x1) + (y2 - y1)*(y2 - y1);</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>var dotProduct:Number = ((x - x1)*(x2 - x1) + (y - y1)*(y2 - y1)) / p1_p2_squareLength;</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>if ( dotProduct &lt; 0 )</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>{</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;">  </span>return (x - x1)*(x - x1) + (y - y1)*(y - y1);</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>}</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>else if ( dotProduct &lt;= 1 )</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>{</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;">  </span>var p_p1_squareLength:Number = (x1 - x)*(x1 - x) + (y1 - y)*(y1 - y);</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;">  </span>return p_p1_squareLength - dotProduct * dotProduct * p1_p2_squareLength;</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>}</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>else</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>{</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;">  </span>return (x - x2)*(x - x2) + (y - y2)*(y - y2);</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>}</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;">}</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><br></span>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;">function accuratePointInTriangle(x1, y1, x2, y2, x3, y3, x, y:Number):Boolean</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;">{</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>if (! pointInTriangleBoundingBox(x1, y1, x2, y2, x3, y3, x, y))</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;">  </span>return false;</span><br>
+<span class="Apple-tab-span" style="white-space: pre;"><span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"> </span></span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>if (naivePointInTriangle(x1, y1, x2, y2, x3, y3, x, y))</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;">  </span>return true;</span><br>
+<span class="Apple-tab-span" style="white-space: pre;"><span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"> </span></span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>if (distanceSquarePointToSegment(x1, y1, x2, y2, x, y) &lt;= EPSILON_SQUARE)</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;">  </span>return true;</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>if (distanceSquarePointToSegment(x2, y2, x3, y3, x, y) &lt;= EPSILON_SQUARE)</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;">  </span>return true;</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>if (distanceSquarePointToSegment(x3, y3, x1, y1, x, y) &lt;= EPSILON_SQUARE)</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;">  </span>return true;</span><br>
+<span class="Apple-tab-span" style="white-space: pre;"><span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"> </span></span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;"><span class="Apple-tab-span" style="white-space: pre;"> </span>return false;</span><br>
+<span style="color: purple; font-family: Verdana, sans-serif; font-size: xx-small;">}</span><br>
+<br>
+<br>
+I hope you appreciated.<br>
+<br></div>
+</div>
+<div>
+<br></div>
+<div>
+<span style="font-size: x-small;">* all the tests are done in Actionscript 3, typing values with the native&nbsp;<a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/Number.html" target="_blank">Number type</a>&nbsp;(IEEE-754 double-precision floating-point number).</span></div>
+<div>
+<br></div>
+<div>
+<br></div>
+</div>
+  </body>
+</html>
