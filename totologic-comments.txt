@@ -1,0 +1,38 @@
+Some comments on the post, also preserved for posterity. :)
+
+dreadful rauwJuly 6, 2014 at 1:29 AM
+On the dot product interiority test, I don't think you have to assume that p1, p2, p3 are in counter-clockwise order. Just continue with the rest, and if the dot products /are all the same sign/ then you're on the same side of all, and thus inside. (You could not be on the /outside/ of them all is why this works.)
+
+Reply
+Replies
+
+LogicJuly 6, 2014 at 3:37 AM
+You are totally right.
+
+Reply
+
+AnonymousSeptember 8, 2014 at 1:41 AM
+Nice article!
+
+I am trying out the second one (parametric equations system). I am wondering however: in the calculations the denominator could be zero. Could this happen in practise? What would this mean geometrically if this was the case?
+
+Reply
+Replies
+
+LogicSeptember 8, 2014 at 4:25 AM
+Usually, 0 value for denominator happens for degenerate cases.
+
+For example, when you try to find the intersection of 2 lines using a parametric system, you face a 0 value when lines are parallel.
+
+In our case our system try to find the p coordinates as a linear combination of [p1, p2] and {p1, p3]. So what are our degenerate cases ? For example, when p2 = p3 ! Meaning your triangle is collapsed as a flat line !
+
+
+drecNovember 9, 2015 at 8:26 PM
+so first you have to test if the triangle is in fact a triangle?
+
+
+LogicNovember 10, 2015 at 4:17 AM
+If you are not sure that your triangle is safe, better is to check it before perfoming calculation. Check if any 2 points don't overlap. But problems can still occur with points being too close from each other !
+
+That is why in my library (Daedalus Lib) I proceeded differently. I choosed to merge points that are too close each other. For that I checked if the distance is smaller than the epsilon value.
+
