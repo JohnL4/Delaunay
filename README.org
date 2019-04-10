@@ -5,6 +5,10 @@
 #+HTML_HEAD: <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:400,400i,600,600i">
 #+HTML_HEAD: <link rel="stylesheet" href="org-mode.css" type="text/css"/>
 
+* Source Code
+
+  https://github.com/JohnL4/Delaunay.git
+
 * Links
 
 ** Delaunay
