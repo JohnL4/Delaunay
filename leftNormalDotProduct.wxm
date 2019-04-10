@@ -1,0 +1,76 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 15.04.0 ] */
+
+/* [wxMaxima: input   start ] */
+load("vect");
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+x: matrix([1,1]);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+y: matrix([1,1]);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+x . y;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+y: matrix([-1,1]);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+x.y;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+x: matrix([x1,x2]);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+y: matrix([y1,y2]);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+x.y;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+Compute "left normal" vector to a line segment pt1 --> pt2.
+The vector is actually (-deltaY, deltaX).
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+deltaY: y2-y1; deltaX: x2-x1;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+leftNormal: matrix([-deltaY,deltaX]);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+Now compute a vector from pt1 (start of line segment) to ptt = (xt,yt) (the point under test).
+This is done by simple (vector) subtraction.
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+testVector: matrix([xt-x1,yt-y1]);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+Now we let Maxima simplify the dot product.
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+leftNormal . testVector;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+...and we see that the totologic blog post has the signs reversed (presumably because
+he had the y-axis reversed for typical computer screens).
+   [wxMaxima: comment end   ] */
+
+/* Maxima can't load/batch files which end with a comment! */
+"Created with wxMaxima"$

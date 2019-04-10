@@ -11,8 +11,8 @@ dotProduct
   (Point id (x,y))              -- ^ The point being tested.
   (Point id1 (x1,y1))           -- ^ Starting point of the side
   (Point id2 (x2,y2))           -- ^ Ending point of the side
-  = (y2 - y1) * (x - x1) + (-x2 * x1) * (y - y1) -- TODO: not sure the sign of this is correct. Totologic may have had
-                                                 -- the y-axis flipped.
+  = (y1 - y2) * (x - x1) + (x2 - x1) * (y - y1) -- TODO: not sure the sign of this is correct. Totologic may have had
+                                                -- the y-axis flipped.
 
 {-
 Totologic ActionScript 3 code:
