@@ -11,7 +11,7 @@ dotProduct
   (Point id (x,y))              -- ^ The point being tested.
   (Point id1 (x1,y1))           -- ^ Starting point of the side
   (Point id2 (x2,y2))           -- ^ Ending point of the side
-  = (y1 - y2) * (x - x1) + (x2 - x1) * (y - y1) 
+  = (y1 - y2) * (x - x1) + (x2 - x1) * (y - y1)
 
 {-
 Totologic ActionScript 3 code:
@@ -34,9 +34,9 @@ Totologic ActionScript 3 code:
 isPointInTriangleNaive :: Point -> Point -> Point -> Point -> Bool
 isPointInTriangleNaive
   pt                            -- ^ Point under test
-  pt1                           -- ^ First triangle vertex  
-  pt2                           -- ^ Second triangle vertex 
-  pt3                           -- ^ Third triangle vertex  
+  pt1                           -- ^ First triangle vertex
+  pt2                           -- ^ Second triangle vertex
+  pt3                           -- ^ Third triangle vertex
   = False -- TODO: implement
 
 {-
@@ -59,11 +59,16 @@ isPointInTriangleBoundingBox :: Double -> Point -> Point -> Point -> Point -> Bo
 isPointInTriangleBoundingBox
   epsilon                       -- ^ Error amount, point must be w/in this distance of box edge (or clearly inside the
                                 -- box) to count as "in".
-  pt                            -- ^ Point under test
-  pt1                           -- ^ First triangle vertex  
-  pt2                           -- ^ Second triangle vertex 
-  pt3                           -- ^ Third triangle vertex  
-  = False -- TODO: implement
+  (Point _ (x,y))               -- ^ Point under test
+  (Point _ (x1,y1))             -- ^ First triangle vertex
+  (Point _ (x2,y2))             -- ^ Second triangle vertex
+  (Point _ (x3,y3))             -- ^ Third triangle vertex
+  = xMin <= x && x <= xMax && yMin <= y && y <= yMax
+  where
+    xMin = minimum [x1, x2, x3] - epsilon
+    xMax = maximum [x1, x2, x3] + epsilon
+    yMin = minimum [y1, y2, y3] - epsilon
+    yMax = maximum [y1, y2, y3] + epsilon
 
 {-
     function pointInTriangleBoundingBox(x1, y1, x2, y2, x3, y3, x, y:Number):Boolean
@@ -83,10 +88,27 @@ isPointInTriangleBoundingBox
 -- | Computes square of distance from given point to given side.
 distanceSqrdPointToSide :: Point -> Point -> Point -> Double
 distanceSqrdPointToSide
-  pt                            -- ^ The point under test
-  pt1                           -- ^ Starting point of side
-  pt2                           -- ^ Ending point of side
-  = 0.5 -- TODO: implement
+  (Point _ (x,y))               -- ^ The point under test
+  (Point _ (x1,y1))             -- ^ Starting point of side
+  (Point _ (x2,y2))             -- ^ Ending point of side
+{-
+                                      p2
+                                     /
+  projection of p onto p1p2 ________/
+                                   /\
+                                  /  \
+                                 /    \
+                               p1------p
+-}
+  = let p1p2LengthSqrd = (x2-x1)*(x2-x1) + (y2-y1)*(y2-y1)
+        dotProduct = ((x-x1)*(x2-x1) + (y-y1)*(y2-y1)) / p1p2LengthSqrd
+        pp1LengthSqrd = (x1 - x)*(x1 - x) + (y1 - y)*(y1 - y)
+    in
+      if dotProduct < 0       then pp1LengthSqrd -- Angle > 90°, closest point of side IS p1
+      else if dotProduct <= 1 then pp1LengthSqrd - dotProduct * dotProduct * p1p2LengthSqrd
+                              else (x - x2)*(x - x2) + (y - y2)*(y - y2)
+
+      -- TODO: not at ALL sure this is correct.
 
 {-
     function distanceSquarePointToSegment(x1, y1, x2, y2, x, y:Number):Number

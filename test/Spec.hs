@@ -4,6 +4,7 @@ import Graphics.Delaunay
 import Graphics.Point as Pt
 import Graphics.MeshPoint as MP
 import Graphics.Graph as G
+import Graphics.Triangle.Internal
 
 import Data.Set
 
@@ -51,6 +52,55 @@ main = hspec $ do
                , (3.0, 1.0)
                , (4.0, 2.0)
                ]) == 4
+  describe "Graphics.Triangle.Internal.dotProduct" $ do
+{-
+                        b
+                    t  /
+                      /  u
+                     a
+-}
+    it "Returns correct sign" $
+      let a = Point 1 (1,1)
+          b = Point 2 (3,3)
+          t = Point 3 (0,2)
+          u = Point 4 (4,2)
+      in dotProduct t a b > 0
+         && dotProduct u a b < 0
+         -- Reversed endpoints should reverse signs (duh?)
+         && dotProduct t b a < 0
+         && dotProduct u b a > 0
+
+  describe "Graphics.Triangle.Internal.isPointInTriangleBoundingBox" $ do
+{-
+                       v
+
+                   +---c---+
+                   |  / \ s|
+               w   | / t \ |  u
+                   |/     \|
+                   a-------b
+                       r
+-}
+    it "Returns correct value" $
+      let a = Point 1 (2,2)
+          b = Point 2 (6,2)
+          c = Point 3 (4,6)
+          t = Point 4 (4,4)
+          u = Point 5 (8,4)
+          v = Point 6 (4,8)
+          w = Point 7 (0,4)
+          r = Point 8 (4,0)
+          s = Point 9 (5.9,5.9)
+      in (Prelude.map (\pt -> isPointInTriangleBoundingBox 0.001 pt a b c) [t,u,v,w,r,s])
+         == [True, False, False, False, False, True]
+
+
+
+
+
+
+
+
 
 {-
 Initial result of dumb 4-pt delTri call:

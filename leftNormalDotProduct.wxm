@@ -1,6 +1,10 @@
 /* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
 /* [ Created with wxMaxima version 15.04.0 ] */
 
+/* [wxMaxima: section start ]
+Dot product with side's left normal
+   [wxMaxima: section end   ] */
+
 /* [wxMaxima: input   start ] */
 load("vect");
 /* [wxMaxima: input   end   ] */
@@ -68,8 +72,119 @@ leftNormal . testVector;
 /* [wxMaxima: input   end   ] */
 
 /* [wxMaxima: comment start ]
-...and we see that the totologic blog post has the signs reversed (presumably because
+...which is obvious, but I had made the mistake of trying to expand the above expression
+by hand and then simplify after cancelling some opposite-sign terms out and factoring.
+I think that was doomed to failure.
+
+We see that the totologic blog post has the signs reversed (presumably because
 he had the y-axis reversed for typical computer screens).
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: section start ]
+Distance from point to side (segment)
+   [wxMaxima: section end   ] */
+
+/* [wxMaxima: comment start ]
+We're going to find an expression for d^2, the distance d of the test point from the triangle side, squared.
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+kill (x,y); p1: matrix([x1,y1]); p2: matrix([x2,y2]); p: matrix([x,y]);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+p1p2 `dot` pp1 == |p1p2| * |pp1| * cos(theta, the angle between the vectors)
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+p1p2: p2-p1;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+pp1: p - p1;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+(Inconsistent naming, but so what. 
+p1p2 is the vector FROM p1 TO p2.
+pp1 is the vector FROM p1 TO p.)
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+p1p2 . pp1;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+pp1;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+pp1[1][1];
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+Length^2 of pp1, which is the hypotenuse of a right triangle
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+hypSqrd: pp1[1][1]^2 + pp1[1][2]^2;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+One leg of right triangle, the projection of pp1 onto p1p2, has length squared = (p1p2 . pp1)^2 / |p1p2|^2
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+p1p2Sqrd: p1p2[1][1]^2 + p1p2[1][2]^2;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+projSqrd: (pp1 . p1p2)^2 / p1p2Sqrd;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+Length, d, of remaining leg of triangle is unknown, BUT Pythagoras tells us
+|pp1|^2 - (pp1 . p1p2)^2 / |p1p2|^2 = d^2.
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+dSqrd: hypSqrd - projSqrd;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+If we set up a simple test of a vertical line of length 2 (from (0,-1) to (0,1)), and a test point on the
+x-axis (y=0) being brought to the y-axis (x -> 0), then the distance of the test point from the line
+segment should be exactly x.  And it is (don't forget we're calculating distance SQUARED):
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+ev(dSqrd, x1=0, y1=-1, x2=0, y2=1, y=0);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+ev(dSqrd, x1=0, y1=-1, x2=0, y2=1);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+If our test point is at (1,y) and we're projecting onto a vertical line on the y-axis, it doesn't matter
+what our x value is, because only the y value determines what the projection will be.  And if y is
+larger than the length of our "triangle side" p1p2, then so be it, the projection will also be large.
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+ev( projSqrd, x1=0, y1=0, x2=0, y2=2, x=1);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+ev( projSqrd, x1=0, y1=0, x2=0, y2=2, x=1, y=10);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+So, we have to check if the projection is larger than |p1p2|, and, if so, we know that the test vector pp1
+is actually LONGER than the triangle side, so we truncate the testing against epsilon^2 by
+simply computing the distance from the test point p to p2, the other ("far") end of the triangle side.
+
+That's not described in this document, but it is in the code.
    [wxMaxima: comment end   ] */
 
 /* Maxima can't load/batch files which end with a comment! */
