@@ -85,28 +85,25 @@ isPointInTriangleBoundingBox
     }
 -}
 
--- | Computes square of distance from given point to given side.
-distanceSqrdPointToSide :: Point -> Point -> Point -> Double
-distanceSqrdPointToSide
+-- | Returns True iff the given point is within the given distance epsilon of the given side
+isWithinEpsilonOf :: Double -> Point -> Point -> Point -> Bool
+isWithinEpsilonOf
+  epsilon                       -- ^ The allowed absolute error
   (Point _ (x,y))               -- ^ The point under test
   (Point _ (x1,y1))             -- ^ Starting point of side
   (Point _ (x2,y2))             -- ^ Ending point of side
-{-
-                                      p2
-                                     /
-  projection of p onto p1p2 ________/
-                                   /\
-                                  /  \
-                                 /    \
-                               p1------p
--}
-  = let p1p2LengthSqrd = (x2-x1)*(x2-x1) + (y2-y1)*(y2-y1)
-        dotProduct = ((x-x1)*(x2-x1) + (y-y1)*(y2-y1)) / p1p2LengthSqrd
-        pp1LengthSqrd = (x1 - x)*(x1 - x) + (y1 - y)*(y1 - y)
+  = let p1p2LengthSqrd  = (x2-x1) * (x2-x1) + (y2-y1) * (y2-y1) -- Length of p1p2, squared.
+        p1pLengthSqrd   = (x1-x) * (x1-x) + (y1-y) * (y1-y)     -- Length of p1p, squared
+        p2pLengthSqrd   = (x2-x) * (x2-x) + (y2-y) * (y2-y)     -- Length of p2p, squared
+        dotProduct      = ((x-x1) * (x2-x1) + (y-y1) * (y2-y1)) -- Dot product of p1p2 and p1p
+        epsilonSqrd     = epsilon * epsilon
     in
-      if dotProduct < 0       then pp1LengthSqrd -- Angle > 90°, closest point of side IS p1
-      else if dotProduct <= 1 then pp1LengthSqrd - dotProduct * dotProduct * p1p2LengthSqrd
-                              else (x - x2)*(x - x2) + (y - y2)*(y - y2)
+      if dotProduct < 0 then p1pLengthSqrd <= epsilonSqrd -- Angle > 90°, closest point of side IS p1
+      else if dotProduct * dotProduct <= p1p2LengthSqrd * p1p2LengthSqrd -- See accompanying Jupyter notebook
+           then p1p2LengthSqrd * p1pLengthSqrd
+                - ((x-x1) * (x1-x2) + (y-y1) * (y1-y2)) * ((x-x1) * (x1-x2) + (y-y1) * (y1-y2))
+                <= epsilonSqrd * p1p2LengthSqrd
+           else p2pLengthSqrd <= epsilonSqrd -- Project is past p2, closest point of side IS p2
 
       -- TODO: not at ALL sure this is correct.
 

@@ -26,12 +26,10 @@ isIn
   pt3                           -- ^ Third triangle vertex  
   = if not $ isPointInTriangleBoundingBox epsilon pt pt1 pt2 pt3        then False
     else if isPointInTriangleNaive pt pt1 pt2 pt3                       then True
-         else if distanceSqrdPointToSide pt pt1 pt2 <= epsilonSqrd
-                 || distanceSqrdPointToSide pt pt2 pt3 <= epsilonSqrd
-                 || distanceSqrdPointToSide pt pt3 pt1 <= epsilonSqrd   then True
+         else if isWithinEpsilonOf epsilon pt pt1 pt2
+                 || isWithinEpsilonOf epsilon pt pt2 pt3
+                 || isWithinEpsilonOf epsilon pt pt3 pt1                  then True
                                                                         else False
-  where
-    epsilonSqrd = epsilon * epsilon
 
 {-
     function accuratePointInTriangle(x1, y1, x2, y2, x3, y3, x, y:Number):Boolean

@@ -94,7 +94,21 @@ main = hspec $ do
       in (Prelude.map (\pt -> isPointInTriangleBoundingBox 0.001 pt a b c) [t,u,v,w,r,s])
          == [True, False, False, False, False, True]
 
-
+  describe "Graphics.Triangle.Internal.isWithinEpsilonOf" $ do
+    it "is false for points way off p1" $
+      not $ isWithinEpsilonOf 0.2 (Point 99 (0,0)) (Point 1 (1,1)) (Point 2 (2,2))
+    it "is false for points way off the midpt" $
+      not $ isWithinEpsilonOf 0.2 (Point 99 (1.75, 1.25)) (Point 1 (1,1)) (Point 2 (2,2))
+    it "is false for points way off p2" $
+      not $ isWithinEpsilonOf 0.2 (Point 99 (3,3)) (Point 1 (1,1)) (Point 2 (2,2))
+    it "is true for points just barely off p1" $
+      isWithinEpsilonOf 0.2 (Point 99 (0.9, 0.9)) (Point 1 (1,1)) (Point 2 (2,2))
+    it "is true for points just barely to the right of the midpt" $
+      isWithinEpsilonOf 0.2 (Point 99 (1.6, 1.5)) (Point 1 (1,1)) (Point 2 (2,2))
+    it "is true for points just barely below the midpt" $
+      isWithinEpsilonOf 0.2 (Point 99 (1.5, 1.4)) (Point 1 (1,1)) (Point 2 (2,2))
+    it "is true for points just barely off p2" $
+      isWithinEpsilonOf 0.2 (Point 99 (2.1, 2.1)) (Point 1 (1,1)) (Point 2 (2,2))
 
 
 
