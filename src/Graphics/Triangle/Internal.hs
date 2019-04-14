@@ -116,8 +116,10 @@ isWithinEpsilonOf
 -- | Returns True iff the points given are in counterclockwise order.  (Assumes they're not colinear or coincident.)
 isCounterClockwise :: Point -> Point -> Point -> Bool
 isCounterClockwise (Point _ (x_A, y_A)) (Point _ (x_B, y_B)) (Point _ (x_C, y_C))
+  = 0 < x_A * y_B - x_A * y_C - x_B * y_A + x_B * y_C + x_C * y_A - x_C * y_B
+{-
   = 0 < (detLU $ fromLists [ [ x_A, y_A, 1 ]
                            , [ x_B, y_B, 1 ]
                            , [ x_C, y_C, 1 ]
                            ])
-    
+-}
