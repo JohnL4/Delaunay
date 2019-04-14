@@ -4,6 +4,7 @@ import Graphics.Delaunay
 import Graphics.Point as Pt
 import Graphics.MeshPoint as MP
 import Graphics.Graph as G
+import Graphics.Triangle
 import Graphics.Triangle.Internal
 
 import Data.Set
@@ -110,35 +111,41 @@ main = hspec $ do
     it "is true for points just barely off p2" $
       isWithinEpsilonOf 0.2 (Point 99 (2.1, 2.1)) (Point 1 (1,1)) (Point 2 (2,2))
 
+  describe "Graphics.Triangle.Internal.isCounterClockwise" $ do
+    it "Is true for simple triangles" $
+      isCounterClockwise (Point 1 (1,1)) (Point 2 (2,1)) (Point 3 (2,2))
+    it "Is true for counterclockwise triangles defined with trig" $
+      not $ isCounterClockwise   (Point 1 (cos (pi/3), sin (pi/3)))  
+                                 (Point 2 (1,0))                     
+                                 (Point 3 (cos (-pi/3), sin (-pi/3)))
+    it "Is false for clockwise triangles defined with trig" $
+      isCounterClockwise   (Point 1 (cos (pi/3), sin (pi/3)))  
+                           (Point 3 (cos (-pi/3), sin (-pi/3)))
+                           (Point 2 (1,0))                     
 
-
-
-
-
-
-{-
-Initial result of dumb 4-pt delTri call:
-
-Graph (fromList [
-          MeshPoint {point = Point {id = 0, coords = (1.0,1.0)},
-                     adj = fromList [Point {id = 1, coords = (2.0,2.0)}
-                                    ,Point {id = 2, coords = (3.0,3.0)}]}
-          ,MeshPoint {point = Point {id = 1, coords = (2.0,2.0)},
-                      adj = fromList [Point {id = 0, coords = (1.0,1.0)}
-                                     ,Point {id = 2, coords = (3.0,3.0)}]}
-          ,MeshPoint {point = Point {id = 2, coords = (3.0,3.0)},
-                      adj = fromList [Point {id = 0, coords = (1.0,1.0)}
-                                     ,Point {id = 1, coords = (2.0,2.0)}]}
-          ,MeshPoint {point = Point {id = 3, coords = (4.0,4.0)},
-                      adj = fromList []}]
-      )
--}
-
-
-
-{-
-main = do
-  putStrLn "----------------  Begin Test  ----------------"
-  delaunayIO
-  putStrLn "Test suite not yet implemented"
--}
+  describe "Graphics.Triangle.Internal.isInCircle" $ do
+    it "Returns false for points outside an equilateral triangle" $
+      not $ isInCircle  (Point 1 (1,0))
+                        (Point 2 (cos (2 * pi / 3), sin (2 * pi / 3)))
+                        (Point 3 (cos (4 * pi / 3), sin (4 * pi / 3)))
+                        (Point 99 (2,0))
+    it "Returns true for points inside an equilateral triangle" $
+      isInCircle  (Point 1 (1,0))                               
+                  (Point 2 (cos (2 * pi / 3), sin (2 * pi / 3)))
+                  (Point 3 (cos (4 * pi / 3), sin (4 * pi / 3)))
+                  (Point 99 (0.2, 0.2))
+    it "Returns false for points outside the circle described by an arc" $
+      not $ isInCircle  (Point 1 (cos (pi/3), sin (pi/3)))
+                        (Point 2 (cos (-pi/3), sin (-pi/3)))
+                        (Point 3 (1,0))
+                        (Point 99 (2,0))
+    it "Doesn't care about the order of the points" $
+      not $ isInCircle  (Point 1 (cos (pi/3), sin (pi/3)))
+                        (Point 2 (1,0))
+                        (Point 3 (cos (-pi/3), sin (-pi/3)))
+                        (Point 99 (2,0))
+    it "Returns true for points inside the circle described by an arc" $
+      isInCircle  (Point 1 (cos (pi/3), sin (pi/3)))
+                  (Point 2 (1,0))
+                  (Point 3 (cos (-pi/3), sin (-pi/3)))
+                  (Point 99 (0.2, 0.2))

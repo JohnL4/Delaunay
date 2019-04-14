@@ -1,5 +1,8 @@
 module Graphics.Triangle.Internal where
 
+import Debug.Trace
+import Data.Matrix
+
 import Graphics.Point
 
 -- | Compute the dot product of two vectors:
@@ -98,32 +101,23 @@ isWithinEpsilonOf
         dotProduct      = ((x-x1) * (x2-x1) + (y-y1) * (y2-y1)) -- Dot product of p1p2 and p1p
         epsilonSqrd     = epsilon * epsilon
     in
-      if dotProduct < 0 then p1pLengthSqrd <= epsilonSqrd -- Angle > 90°, closest point of side IS p1
+      if dotProduct < 0 then
+        -- trace ("dotProduct < 0, p1pLengthSqrd = " ++ show p1pLengthSqrd)
+        p1pLengthSqrd <= epsilonSqrd -- Angle > 90°, closest point of side IS p1
       else if dotProduct * dotProduct <= p1p2LengthSqrd * p1p2LengthSqrd -- See accompanying Jupyter notebook
-           then p1p2LengthSqrd * p1pLengthSqrd
+           then -- trace "p off side"
+                p1p2LengthSqrd * p1pLengthSqrd
                 - ((x-x1) * (x1-x2) + (y-y1) * (y1-y2)) * ((x-x1) * (x1-x2) + (y-y1) * (y1-y2))
                 <= epsilonSqrd * p1p2LengthSqrd
-           else p2pLengthSqrd <= epsilonSqrd -- Project is past p2, closest point of side IS p2
+           else
+             -- trace "p off p2"
+             p2pLengthSqrd <= epsilonSqrd -- Project is past p2, closest point of side IS p2
 
-      -- TODO: not at ALL sure this is correct.
-
-{-
-    function distanceSquarePointToSegment(x1, y1, x2, y2, x, y:Number):Number
-    {
-     var p1_p2_squareLength:Number = (x2 - x1)*(x2 - x1) + (y2 - y1)*(y2 - y1);
-     var dotProduct:Number = ((x - x1)*(x2 - x1) + (y - y1)*(y2 - y1)) / p1_p2_squareLength;
-     if ( dotProduct < 0 )
-     {
-      return (x - x1)*(x - x1) + (y - y1)*(y - y1);
-     }
-     else if ( dotProduct <= 1 )
-     {
-      var p_p1_squareLength:Number = (x1 - x)*(x1 - x) + (y1 - y)*(y1 - y);
-      return p_p1_squareLength - dotProduct * dotProduct * p1_p2_squareLength;
-     }
-     else
-     {
-      return (x - x2)*(x - x2) + (y - y2)*(y - y2);
-     }
-    }
--}
+-- | Returns True iff the points given are in counterclockwise order.  (Assumes they're not colinear or coincident.)
+isCounterClockwise :: Point -> Point -> Point -> Bool
+isCounterClockwise (Point _ (x_A, y_A)) (Point _ (x_B, y_B)) (Point _ (x_C, y_C))
+  = 0 < (detLU $ fromLists [ [ x_A, y_A, 1 ]
+                           , [ x_B, y_B, 1 ]
+                           , [ x_C, y_C, 1 ]
+                           ])
+    
