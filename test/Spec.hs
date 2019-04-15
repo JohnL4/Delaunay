@@ -95,6 +95,28 @@ main = hspec $ do
       in (Prelude.map (\pt -> isPointInTriangleBoundingBox 0.001 pt a b c) [t,u,v,w,r,s])
          == [True, False, False, False, False, True]
 
+  describe "Graphics.Triangle.Internal.isPointInTriangleNaive" $ do
+    it "Is True for point inside triangle" $
+      isPointInTriangleNaive  (Point 99 (0.2, 0.2))
+                              (Point 1 (1,0))
+                              (Point 2 (cos (2 * pi / 3), sin (2 * pi / 3)))  
+                              (Point 3 (cos (4 * pi / 3), sin (4 * pi / 3)))  
+    it "Is True no matter the order of the triangle vertices" $
+      isPointInTriangleNaive  (Point 99 (0.2, 0.2))
+                              (Point 1 (1,0))
+                              (Point 3 (cos (4 * pi / 3), sin (4 * pi / 3)))  
+                              (Point 2 (cos (2 * pi / 3), sin (2 * pi / 3)))  
+    it "Is False for point outside triangle" $
+      not $ isPointInTriangleNaive  (Point 99 (2,0))
+                                    (Point 1 (1,0))
+                                    (Point 2 (cos (2 * pi / 3), sin (2 * pi / 3)))  
+                                    (Point 3 (cos (4 * pi / 3), sin (4 * pi / 3)))  
+    it "Is False for point outside triangle regardless of vertex order" $
+      not $ isPointInTriangleNaive  (Point 99 (2,0))
+                                    (Point 1 (1,0))
+                                    (Point 3 (cos (4 * pi / 3), sin (4 * pi / 3)))  
+                                    (Point 2 (cos (2 * pi / 3), sin (2 * pi / 3)))  
+
   describe "Graphics.Triangle.Internal.isWithinEpsilonOf" $ do
     it "is false for points way off p1" $
       not $ isWithinEpsilonOf 0.2 (Point 99 (0,0)) (Point 1 (1,1)) (Point 2 (2,2))
@@ -128,7 +150,7 @@ main = hspec $ do
       not $ isInCircle  (Point 1 (1,0))
                         (Point 2 (cos (2 * pi / 3), sin (2 * pi / 3)))
                         (Point 3 (cos (4 * pi / 3), sin (4 * pi / 3)))
-                        (Point 99 (2,0))
+                        (Point 99 (2,0))                                
     it "Returns true for points inside an equilateral triangle" $
       isInCircle  (Point 1 (1,0))                               
                   (Point 2 (cos (2 * pi / 3), sin (2 * pi / 3)))
@@ -149,3 +171,15 @@ main = hspec $ do
                   (Point 2 (1,0))
                   (Point 3 (cos (-pi/3), sin (-pi/3)))
                   (Point 99 (0.2, 0.2))
+
+  describe "Graphics.Triangle.isInTriangle" $ do
+    it "Returns true for the simple case" $
+      isInTriangle 0.001   (Point 99 (0.4, 0.2))
+                           (Point 1 (0,0))
+                           (Point 2 (1,0))
+                           (Point 3 (1,1))
+    it "Returns true regardless of the order of triangle points" $
+      isInTriangle 0.001   (Point 99 (0.4, 0.2))
+                           (Point 1 (0,0))
+                           (Point 3 (1,1))
+                           (Point 2 (1,0))

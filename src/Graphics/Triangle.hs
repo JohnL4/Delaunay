@@ -9,6 +9,7 @@ import Graphics.Point
 import Graphics.Triangle.Internal
 
 import Data.Matrix
+import Debug.Trace as T
 
 -- | Returns True iff the given point is inside the given non-degenerate triangle.
 -- | Makes a fast, accurate determination by combining the other (private) functions in this module.
@@ -19,12 +20,16 @@ isInTriangle
   pt1                           -- ^ First triangle vertex  
   pt2                           -- ^ Second triangle vertex 
   pt3                           -- ^ Third triangle vertex  
-  = if not $ isPointInTriangleBoundingBox epsilon pt pt1 pt2 pt3     then False
-    else if isPointInTriangleNaive pt pt1 pt2 pt3                    then True
+  = if not $ isPointInTriangleBoundingBox epsilon pt pt1 pt2 pt3     then -- T.trace "Not in bounding box"
+                                                                          False
+    else if isPointInTriangleNaive pt pt1 pt2 pt3                    then -- T.trace "Is in triangle naively"
+                                                                          True
          else if isWithinEpsilonOf epsilon pt pt1 pt2
                  || isWithinEpsilonOf epsilon pt pt2 pt3
-                 || isWithinEpsilonOf epsilon pt pt3 pt1             then True
-                                                                     else False
+                 || isWithinEpsilonOf epsilon pt pt3 pt1             then -- T.trace ("Is within " ++ show epsilon ++ " of a side")
+                                                                          True
+                                                                     else -- T.trace "Not in triangle"
+                                                                          False
 
 -- | Returns true iff the given point is in the circle determined by the given triangle.  Note that this function will
 -- coerce the triangle to be counterclockwise (by testing it and transposing the last two points if necessary).
