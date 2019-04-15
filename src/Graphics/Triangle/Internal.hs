@@ -11,9 +11,9 @@ import Graphics.Point
 -- The order in which the points are given is irrelevant; see the totologic comments file in the source code.
 dotProduct :: Point -> Point -> Point -> Double
 dotProduct
-  (Point id (x,y))              -- ^ The point being tested.
-  (Point id1 (x1,y1))           -- ^ Starting point of the side
-  (Point id2 (x2,y2))           -- ^ Ending point of the side
+  (Point _ (x,y))               -- ^ The point being tested.
+  (Point _ (x1,y1))             -- ^ Starting point of the side
+  (Point _ (x2,y2))             -- ^ Ending point of the side
   = (y1 - y2) * (x - x1) + (x2 - x1) * (y - y1)
 
 {-
@@ -40,7 +40,16 @@ isPointInTriangleNaive
   pt1                           -- ^ First triangle vertex
   pt2                           -- ^ Second triangle vertex
   pt3                           -- ^ Third triangle vertex
-  = False -- TODO: implement
+  = let dp1 = dotProduct pt pt1 pt2
+        dp2 = dotProduct pt pt2 pt3
+        dp3 = dotProduct pt pt3 pt1
+    in
+      -- As pointed out in a totologic comment, triangle point order doesn't matter so long as all the dot product signs
+      -- are the same.
+      (signum dp1) == (signum dp2) && (signum dp2) == (signum dp3)
+  
+    
+  
 
 {-
     /**
