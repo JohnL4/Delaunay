@@ -6,6 +6,7 @@ import Graphics.MeshPoint as MP
 import Graphics.Graph as G
 import Graphics.Triangle
 import Graphics.Triangle.Internal
+import TriTree
 
 import Data.Set
 
@@ -183,3 +184,10 @@ main = hspec $ do
                            (Point 1 (0,0))
                            (Point 3 (1,1))
                            (Point 2 (1,0))
+
+  describe "TriTree" $ do
+    it "adds point" $
+      addPoint (TriTree { triangle = Data.Set.empty }) (Point 1 (1,1)) == Data.Set.empty
+    it "flips edge" $
+      flipEdge (TriTree { triangle = Data.Set.empty }) (TriTree { triangle = Data.Set.empty })
+      == ( TriTree { triangle = Data.Set.empty }, TriTree { triangle = Data.Set.empty } )
