@@ -2,6 +2,9 @@ module Graphics.Triangle
   (
     Graphics.Triangle.isInTriangle
   , Graphics.Triangle.isInCircle
+  , Triangle
+  , makeTriangle
+  , Graphics.Triangle.show
   )
   where
 
@@ -10,6 +13,23 @@ import Graphics.Triangle.Internal
 
 import Data.Matrix
 import Debug.Trace as T
+import Data.Set as Set
+
+  -- -------------------------------------------  "Triangle" data structure  -------------------------------------------
+  
+-- | A set of exactly three points.
+data Triangle = Triangle (Set Point) -- We use Set so we get Eq and intersection ops for free (intersection for deciding
+                                     -- edge comonality).
+
+-- | Makes a Triangle from three points.
+makeTriangle :: Point -> Point -> Point -> Triangle
+makeTriangle a b c = Triangle (Set.fromList [a,b,c])
+
+show :: Triangle -> String
+show (Triangle pts) = "(" ++ (Prelude.show a) ++ ", " ++ (Prelude.show b) ++ ", " ++ (Prelude.show c) ++ ")"
+  where [a,b,c] = Set.toList pts
+
+  -- ----------------------------------------  "Triangle" data structure ends  -----------------------------------------
 
 -- | Returns True iff the given point is inside the given non-degenerate triangle.
 -- | Makes a fast, accurate determination by combining the other (private) functions in this module.

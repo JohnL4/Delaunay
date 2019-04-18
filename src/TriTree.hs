@@ -63,7 +63,31 @@ addPoint _ _ = error "not implemented"
 flipEdge :: TriTree -> TriTree -> (TriTree, TriTree)
 flipEdge _ _ = error "not implemented"
 
+-- | If we have a TriTree, where did we come from?
+data TTBreadCrumb = FromParent { parent :: TriTree -- ^ parent TriTree less this child
+                               , otherParents :: Set TriTree -- ^ This node's other parents, besides the one it came from
+                               }
+                    | FromNeighbor { neighbor :: TriTree -- ^ The neighbor this node came from
+                                   , otherNeighbors :: Set TriTree -- ^ The other neighbors besides the one this node came from
+                                   }
+                    | FromKids { kid :: TriTree -- ^ The kid we came from
+                               , otherKids :: Set TriTree -- ^ The other kids besides the one we came from
+                               }
+                               
+type TTBreadCrumbs = [ TTBreadCrumb ]
 
+type TTZipper = (TriTree, TTBreadCrumbs)
+
+up :: TTZipper -> TTZipper
+up (this, []) = (this, [])
+up (this, (FromParent t):crumbs) = (TriTree { triangle = triangle t
+                                            , isOld = isOld t
+                                            , kids = insert this $ kids t
+                                            , parents = parents t
+                                            , neighbors = neighbors t
+                                            }
+                                   , crumbs)
+up (this, _) = error "not implemented"
 
 {-
 data TreeDag a = TreeDag {
